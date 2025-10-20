@@ -1,44 +1,91 @@
-// // Copyright (c) 2024, WSO2 LLC. (http://www.wso2.com).
-// //
-// // WSO2 LLC. licenses this file to you under the Apache License,
-// // Version 2.0 (the "License"); you may not use this file except
-// // in compliance with the License.
-// // You may obtain a copy of the License at
-// //
-// // http://www.apache.org/licenses/LICENSE-2.0
-// //
-// // Unless required by applicable law or agreed to in writing,
-// // software distributed under the License is distributed on an
-// // "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// // KIND, either express or implied.  See the License for the
-// // specific language governing permissions and limitations
-// // under the License.
+// Copyright (c) 2024, WSO2 LLC. (http://www.wso2.com).
+//
+// WSO2 LLC. licenses this file to you under the Apache License,
+// Version 2.0 (the "License"); you may not use this file except
+// in compliance with the License.
+// You may obtain a copy of the License at
+//
+// http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
 
-// import ballerina/os;
-// import ballerina/test;
+import ballerina/os;
+import ballerina/test;
+import ballerina/uuid;
 
-// configurable boolean isLiveServer = os:getEnv("IS_LIVE_SERVER") == "true";
-// configurable string token = isLiveServer ? os:getEnv("OPENAI_TOKEN") : "test";
-// final string mockServiceUrl = "http://localhost:9090";
-// final Client openAIChat = check initClient();
+configurable boolean isLiveServer = os:getEnv("IS_LIVE_SERVER") == "true";
+configurable string serviceUrl = isLiveServer ? os:getEnv("AZURE_SEARCH_SERVICE_URL") : "http://localhost:9090";
+configurable string adminKey = isLiveServer ? os:getEnv("AZURE_SEARCH_ADMIN_KEY") : "test-admin-key";
 
-// function initClient() returns Client|error {
-//     if isLiveServer {
-//         return new ({auth: {token}});
-//     }
-//     return new ({auth: {token}}, mockServiceUrl);
-// }
+final Client searchClient = check initClient();
 
-// @test:Config {
-//     groups: ["live_tests", "mock_tests"]
-// }
-// isolated function testChatCompletion() returns error? {
-//     CreateChatCompletionRequest request = {
-//         model: "gpt-4o-mini",
-//         messages: [{"role": "user", "content": "This is a test message"}]
-//     };
-//     CreateChatCompletionResponse response = check openAIChat->/chat/completions.post(request);
-//     test:assertTrue(response.choices.length() > 0, msg = "Expected at least one completion choice");
-//     string? content = response.choices[0].message.content;
-//     test:assertTrue(content !is (), msg = "Expected content in the completion response");
-// }
+function initClient() returns Client|error {
+    return new (serviceUrl, {auth: {apiKey: adminKey}});
+}
+
+@test:Config {
+    groups: ["live_tests", "mock_tests"]
+}
+isolated function testCreateSearchIndex() returns error? {
+    string indexName = "test-index-" + uuid:createType1AsString().substring(0, 8);
+    
+    SearchIndex searchIndex = {
+        name: indexName,
+        fields: [
+            {
+                name: "id",
+                'type: "Edm.String",
+                'key: true,
+                searchable: false,
+                filterable: false,
+                sortable: false
+            },
+            {
+                name: "title",
+                'type: "Edm.String",
+                searchable: true,
+                filterable: true,
+                sortable: true
+            },
+            {
+                name: "content",
+                'type: "Edm.String",
+                searchable: true,
+                filterable: false,
+                sortable: false
+            },
+            {
+                name: "rating",
+                'type: "Edm.Double",
+                searchable: false,
+                filterable: true,
+                sortable: true
+            }
+        ]
+    };
+    
+    SearchIndex response = check searchClient->indexesCreate(searchIndex);
+    test:assertTrue(response.name == indexName, msg = "Expected index name to match created index");
+    test:assertTrue(response.fields.length() == 4, msg = "Expected 4 fields in the index");
+}
+
+@test:Config {
+    groups: ["live_tests", "mock_tests"]
+}
+isolated function testListIndexes() returns error? {
+    ListIndexesResult response = check searchClient->indexesList();
+    test:assertTrue(response.value.length() >= 0, msg = "Expected to retrieve indexes list");
+}
+
+@test:Config {
+    groups: ["live_tests", "mock_tests"]
+}
+isolated function testGetServiceStatistics() returns error? {
+    ServiceStatistics stats = check searchClient->getServiceStatistics();
+    test:assertTrue(stats.counters is record {}, msg = "Expected service statistics to have counters");
+}

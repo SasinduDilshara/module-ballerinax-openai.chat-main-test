@@ -46,8 +46,8 @@ task testExamples {
 
 task buildExamples {
     gradle.taskGraph.whenReady { graph ->
-        if (graph.hasTask(":openai.chat-examples:test")) {
-            buildExamples.enabled = false
+        if (graph.hasTask(":ai.azure.search-examples:test")) {
+            buildExamples.enabled = true
         } else {
             testExamples.enabled = false
         }
@@ -70,9 +70,5 @@ task buildExamples {
     }
 }
 
-buildExamples.dependsOn ":openai.chat-ballerina:build"
-testExamples.dependsOn ":openai.chat-ballerina:build"
-
-// TODO: Enable the examples build once https://github.com/ballerina-platform/ballerina-library/issues/6135 is fixed
-// test.dependsOn testExamples
-// build.dependsOn buildExamples
+buildExamples.dependsOn ":ai.azure.search-ballerina:build"
+testExamples.dependsOn ":ai.azure.search-ballerina:build"

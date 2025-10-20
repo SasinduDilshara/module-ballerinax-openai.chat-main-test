@@ -1,18 +1,18 @@
 # Examples
 
-The `ballerinax/openai.chat` connector provides practical examples illustrating usage in various scenarios. Explore these [examples](https://github.com/ballerina-platform/module-ballerinax-openai.chat/tree/main/examples), covering use cases like cache management, session management, and rate limiting.
+The `ballerinax/ai.azure.search` connector provides practical examples illustrating usage in various scenarios. Explore these [examples](https://github.com/ballerina-platform/module-ballerinax-ai.azure.search/tree/main/examples), covering use cases like index management, document indexing, and search operations.
 
-1. [CLI assistant](https://github.com/ballerina-platform/module-ballerinax-openai.chat/tree/main/examples/cli-assistant) - Execute the user's task description by generating and running the appropriate command in the command line interface of their selected operating system.
-2. [Image to markdown document converter](https://github.com/ballerina-platform/module-ballerinax-openai.chat/tree/main/examples/image-to-markdown-converter) - Generate detailed markdown documentation based on the image content.
+1. [RAG ingestion](https://github.com/ballerina-platform/module-ballerinax-ai.azure.search/tree/main/examples/rag-ingestion) - A comprehensive example demonstrating the complete Azure AI Search workflow including data source creation, index creation, indexer setup, and execution.
 
 ## Prerequisites
 
-1. Generate an API key as described in the [Setup guide](https://central.ballerina.io/ballerinax/openai.chat/latest#setup-guide).
+1. Set up Azure AI Search service as described in the [Setup guide](https://central.ballerina.io/ballerinax/ai.azure.search/latest#setup-guide).
 
 2. For each example, create a `Config.toml` file the related configuration. Here's an example of how your `Config.toml` file should look:
 
     ```toml
-    token = "<API Key>"
+    serviceUrl = "https://your-service.search.windows.net"
+    adminKey = "<Admin Key>"
     ```
 
 ## Running an example

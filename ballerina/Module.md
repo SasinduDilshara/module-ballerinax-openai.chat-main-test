@@ -1,51 +1,62 @@
 ## Overview
 
-[OpenAI](https://openai.com/), an AI research organization focused on creating friendly AI for humanity, offers the [OpenAI API](https://platform.openai.com/docs/api-reference/introduction) to access its powerful AI models for tasks like natural language processing and image generation.
+[Azure AI Search](https://azure.microsoft.com/products/ai-services/ai-search/) (formerly known as Azure Cognitive Search) is a cloud search service that gives developers infrastructure, APIs, and tools for building a rich search experience over private, heterogeneous content in web, mobile, and enterprise applications.
 
-The `ballarinax/openai.chat` package offers functionality to connect and interact with [chat completion related endpoints of OpenAI REST API v1](https://platform.openai.com/docs/api-reference/chat) Enabling seamless interaction with the advanced GPT-4 models developed by OpenAI for diverse conversational and text generation tasks.
+The `ballarinax/ai.azure.search` package offers functionality to connect and interact with [Azure AI Search REST API](https://docs.microsoft.com/en-us/rest/api/searchservice/) enabling seamless integration with Azure's powerful search and indexing capabilities for building comprehensive search solutions.
 
 ## Setup guide
 
-To use the OpenAI Connector, you must have access to the OpenAI API through a [OpenAI Platform account](https://platform.openai.com) and a project under it. If you do not have a OpenAI Platform account, you can sign up for one [here](https://platform.openai.com/signup).
+To use the Azure AI Search Connector, you must have an Azure subscription and an Azure AI Search service. If you do not have an Azure account, you can sign up for one at the [Azure portal](https://azure.microsoft.com/free/).
 
-#### Create a OpenAI API Key
+#### Create an Azure AI Search service
 
-1. Open the [OpenAI Platform Dashboard](https://platform.openai.com).
+1. Sign in to the [Azure portal](https://portal.azure.com).
 
-2. Navigate to Dashboard -> API keys.
-<img src=https://raw.githubusercontent.com/ballerina-platform/module-ballerinax-openai.chat/main/docs/setup/resources/navigate-api-key-dashboard.png alt="OpenAI Platform" style="width: 70%;">
+2. Click on "Create a resource" and search for "Azure AI Search".
 
-3. Click on the "Create new secret key" button.
-<img src=https://raw.githubusercontent.com/ballerina-platform/module-ballerinax-openai.chat/main/docs/setup/resources/api-key-dashboard.png alt="OpenAI Platform" style="width: 70%;">
+3. Select "Azure AI Search" and click "Create".
 
-4. Fill the details and click on Create secret key.
-<img src=https://raw.githubusercontent.com/ballerina-platform/module-ballerinax-openai.chat/main/docs/setup/resources/create-new-secret-key.png alt="OpenAI Platform" style="width: 70%;">
+4. Fill in the required details:
+   - Resource group: Select or create a new resource group
+   - Service name: Choose a unique name for your search service
+   - Location: Select a region close to your application
+   - Pricing tier: Choose the appropriate tier based on your needs
 
-5. Store the API key securely to use in your application.
-<img src=https://raw.githubusercontent.com/ballerina-platform/module-ballerinax-openai.chat/main/docs/setup/resources/saved-key.png alt="OpenAI Platform" style="width: 70%;">
+5. Click "Review + create" and then "Create" to provision the service.
+
+#### Get the service URL and admin key
+
+1. Once the service is created, navigate to your Azure AI Search service in the Azure portal.
+
+2. In the "Overview" section, note the URL (e.g., `https://your-service.search.windows.net`).
+
+3. Navigate to "Keys" in the left menu to find your admin keys.
+
+4. Copy either the primary or secondary admin key to use in your application.
 
 ## Quickstart
 
-To use the `OpenAI Chat` connector in your Ballerina application, update the `.bal` file as follows:
+To use the `Azure AI Search` connector in your Ballerina application, update the `.bal` file as follows:
 
 ### Step 1: Import the module
 
-Import the `ballerinax/openai.chat` module.
+Import the `ballerinax/ai.azure.search` module.
 
 ```ballerina
-import ballerinax/openai.chat;
+import ballerinax/ai.azure.search as azureSearch;
 ```
 
 ### Step 2: Create a new connector instance
 
-Create a `chat:Client` with the obtained API Key and initialize the connector.
+Create an `azureSearch:Client` with your Azure AI Search service URL and admin key.
 
 ```ballerina
-configurable string token = ?;
+configurable string serviceUrl = ?;
+configurable string adminKey = ?;
 
-final chat:Client openAIChat = check new({
+final azureSearch:Client searchClient = check new(serviceUrl, {
     auth: {
-        token
+        apiKey: adminKey
     }
 });
 ```
@@ -54,21 +65,31 @@ final chat:Client openAIChat = check new({
 
 Now, you can utilize available connector operations.
 
-#### Generate a response for given message
+#### Create a search index
 
 ```ballerina
 public function main() returns error? {
 
-    // Create a chat completion request.
-    chat:CreateChatCompletionRequest request = {
-        model: "gpt-4o-mini",
-        messages: [{
-            "role": "user",
-            "content": "What is Ballerina programming language?"
-            }]
+    // Define a simple search index
+    azureSearch:SearchIndex searchIndex = {
+        name: "hotels",
+        fields: [
+            {
+                name: "id",
+                'type: "Edm.String",
+                'key: true,
+                searchable: false
+            },
+            {
+                name: "name",
+                'type: "Edm.String",
+                searchable: true,
+                filterable: true
+            }
+        ]
     };
 
-    chat:CreateChatCompletionResponse response = check openAIChat->/chat/completions.post(request);
+    azureSearch:SearchIndex response = check searchClient->indexesCreate(searchIndex);
 }
 ```
 
@@ -80,7 +101,6 @@ bal run
 
 ## Examples
 
-The `OpenAI Chat` connector provides practical examples illustrating usage in various scenarios. Explore these [examples](https://github.com/module-ballerinax-openai.chat/tree/main/examples/), covering the following use cases:
+The `Azure AI Search` connector provides practical examples illustrating usage in various scenarios. Explore these [examples](https://github.com/ballerina-platform/module-ballerinax-ai.azure.search/tree/main/examples/), covering the following use cases:
 
-1. [CLI assistant](https://github.com/ballerina-platform/module-ballerinax-openai.chat/tree/main/examples/cli-assistant) - Execute the user's task description by generating and running the appropriate command in the command line interface of their selected operating system.
-2. [Image to markdown document converter](https://github.com/ballerina-platform/module-ballerinax-openai.chat/tree/main/examples/image-to-markdown-converter) - Generate detailed markdown documentation based on the image content.
+1. [RAG ingestion](https://github.com/ballerina-platform/module-ballerinax-ai.azure.search/tree/main/examples/rag-ingestion) - A comprehensive example demonstrating the complete Azure AI Search workflow including data source creation, index creation, indexer setup, and execution.
