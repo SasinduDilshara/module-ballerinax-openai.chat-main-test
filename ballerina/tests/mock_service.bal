@@ -19,11 +19,6 @@ import ballerina/log;
 
 listener http:Listener httpListener = new (9090);
 
-import ballerina/http;
-import ballerina/log;
-
-listener http:Listener httpListener = new (9090);
-
 http:Service mockService = service object {
     
     // Mock endpoint for creating search indexes
@@ -37,8 +32,8 @@ http:Service mockService = service object {
         SearchIndex response = {
             name: payload.name,
             fields: payload.fields,
-            etag: "\"0x8D123456789ABCD\"",
-            similarityAlgorithm: {
+            "etag": "\"0x8D123456789ABCD\"",
+            "similarityAlgorithm": {
                 "@odata.type": "#Microsoft.Azure.Search.BM25Similarity"
             }
         };
@@ -80,6 +75,26 @@ http:Service mockService = service object {
                 storageSize: {
                     usage: 0,
                     quota: 52428800
+                }, 
+                indexersCount: {
+                    usage: 0,
+                    quota: 10
+                },
+                dataSourcesCount: {
+                    usage: 0,
+                    quota: 100
+                },
+                synonymMaps: {
+                    usage: 0,
+                    quota: 100
+                },
+                skillsetCount: {
+                    usage: 0,
+                    quota: 100
+                },
+                vectorIndexSize: {
+                    usage: 0,
+                    quota: 100000
                 }
             },
             limits: {

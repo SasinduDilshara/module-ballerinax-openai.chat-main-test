@@ -25,7 +25,7 @@ configurable string adminKey = isLiveServer ? os:getEnv("AZURE_SEARCH_ADMIN_KEY"
 final Client searchClient = check initClient();
 
 function initClient() returns Client|error {
-    return new (serviceUrl, {auth: {apiKey: adminKey}});
+    return new (serviceUrl, {});
 }
 
 @test:Config {
@@ -69,7 +69,9 @@ isolated function testCreateSearchIndex() returns error? {
         ]
     };
     
-    SearchIndex response = check searchClient->indexesCreate(searchIndex);
+    SearchIndex response = check searchClient->indexesCreate(searchIndex, {"api-key": adminKey}, {
+        api\-version: "2025-09-01"
+    });
     test:assertTrue(response.name == indexName, msg = "Expected index name to match created index");
     test:assertTrue(response.fields.length() == 4, msg = "Expected 4 fields in the index");
 }
@@ -78,7 +80,9 @@ isolated function testCreateSearchIndex() returns error? {
     groups: ["live_tests", "mock_tests"]
 }
 isolated function testListIndexes() returns error? {
-    ListIndexesResult response = check searchClient->indexesList();
+    ListIndexesResult response = check searchClient->indexesList({"api-key": adminKey}, {
+        api\-version: "2025-09-01"
+    });
     test:assertTrue(response.value.length() >= 0, msg = "Expected to retrieve indexes list");
 }
 
@@ -86,6 +90,8 @@ isolated function testListIndexes() returns error? {
     groups: ["live_tests", "mock_tests"]
 }
 isolated function testGetServiceStatistics() returns error? {
-    ServiceStatistics stats = check searchClient->getServiceStatistics();
+    ServiceStatistics stats = check searchClient->getServiceStatistics({"api-key": adminKey}, {
+        api\-version: "2025-09-01"
+    });
     test:assertTrue(stats.counters is record {}, msg = "Expected service statistics to have counters");
 }
