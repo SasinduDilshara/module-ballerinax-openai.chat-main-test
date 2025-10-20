@@ -54,7 +54,7 @@ These changes are done in order to improve the overall usability, and as workaro
    - **Updated**:
       - Removed the entire `x-ms-examples` property
 
-   - **Reason**: External example references were removed due to [this reason](https://github.com/ballerina-platform/ballerina-library/issues/8361).
+   - **Reason**: External example references can cause issues during client generation and may not be necessary for basic API functionality. Removing these references makes the specification cleaner and more portable.
 
 4. **Changed externalDocs to x-externalDocs**:
 
