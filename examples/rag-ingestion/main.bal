@@ -24,7 +24,7 @@ configurable string storageConnectionString = ?;
 configurable string storageContainerName = ?;
 
 public function main() returns error? {
-    final azureSearch:Client searchClient = check new (serviceUrl, {auth: {apiKey: adminKey}});
+    final azureSearch:Client searchClient = check new (serviceUrl);
     
     io:println("=== Azure AI Search Complete Workflow Example ===");
     io:println("This example demonstrates a complete Azure AI Search workflow:");
@@ -49,7 +49,9 @@ public function main() returns error? {
         description: "Data source for indexing documents from Azure Blob Storage"
     };
     
-    azureSearch:SearchIndexerDataSource createdDataSource = check searchClient->dataSourcesCreateOrUpdate("documents-datasource", {}, dataSource);
+    azureSearch:SearchIndexerDataSource createdDataSource = check searchClient->dataSourcesCreateOrUpdate("documents-datasource", {"api-key": adminKey, Prefer: "return=representation"}, dataSource, {
+        api\-version: "2025-09-01"
+    });
     io:println("✓ Data source created: " + createdDataSource.name);
     
     // Note: You can upload files to Azure Blob Storage using the Azure Storage Service connector
@@ -147,7 +149,9 @@ public function main() returns error? {
         }
     };
     
-    azureSearch:SearchIndex createdIndex = check searchClient->indexesCreateOrUpdate("documents-index", {}, searchIndex);
+    azureSearch:SearchIndex createdIndex = check searchClient->indexesCreateOrUpdate("documents-index", {"api-key": adminKey, Prefer: "return=representation"}, searchIndex, {
+        api\-version: "2025-09-01"
+    });
     io:println("✓ Search index created: " + createdIndex.name);
     
     // Step 3: Create an indexer
@@ -212,12 +216,16 @@ public function main() returns error? {
         ]
     };
     
-    azureSearch:SearchIndexer createdIndexer = check searchClient->indexersCreateOrUpdate("documents-indexer", {}, indexer);
+    azureSearch:SearchIndexer createdIndexer = check searchClient->indexersCreateOrUpdate("documents-indexer", {"api-key": adminKey, Prefer: "return=representation"}, indexer, {
+        api\-version: "2025-09-01"
+    });
     io:println("✓ Indexer created: " + createdIndexer.name);
     
     // Step 4: Run the indexer
     io:println("Step 4: Running indexer...");
-    http:Response runResponse = check searchClient->indexersRun("documents-indexer");
+    http:Response runResponse = check searchClient->indexersRun("documents-indexer", {"api-key": adminKey, "Content-Length": 1000}, {
+        api\-version: "2025-09-01"
+    });
     if runResponse.statusCode == 202 {
         io:println("✓ Indexer started successfully");
     } else {
@@ -226,17 +234,19 @@ public function main() returns error? {
     
     // Step 5: Check indexer status
     io:println("Step 5: Checking indexer status...");
-    azureSearch:SearchIndexerStatus indexerStatus = check searchClient->indexersGetStatus("documents-indexer");
+    azureSearch:SearchIndexerStatus indexerStatus = check searchClient->indexersGetStatus("documents-indexer", {"api-key": adminKey}, {
+        api\-version: "2025-09-01"
+    });
     io:println("✓ Indexer status retrieved:");
     io:println("  - Overall status: " + indexerStatus.status.toString());
-    io:println("  - Last result status: " + (indexerStatus.lastResult?.status.toString() ?: "No previous runs"));
+    io:println("  - Last result status: " + indexerStatus.lastResult?.status.toString());
     
     if indexerStatus.executionHistory.length() > 0 {
         io:println("  - Execution history count: " + indexerStatus.executionHistory.length().toString());
-        azureSearch:SearchIndexerExecutionResult latestExecution = indexerStatus.executionHistory[0];
-        io:println("  - Latest execution start time: " + (latestExecution.startTime?.toString() ?: "N/A"));
-        io:println("  - Items processed: " + (latestExecution.itemCount?.toString() ?: "N/A"));
-        io:println("  - Items failed: " + (latestExecution.failedItemCount?.toString() ?: "N/A"));
+        azureSearch:IndexerExecutionResult latestExecution = indexerStatus.executionHistory[0];
+        io:println("  - Latest execution start time: " + (latestExecution.startTime.toString()));
+        io:println("  - Items processed: " + latestExecution.itemsProcessed.toString());
+        io:println("  - Items failed: " + latestExecution.itemsFailed.toString());
     }
     
     io:println();
