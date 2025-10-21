@@ -15,7 +15,6 @@
 // under the License.
 
 import ballerina/io;
-import ballerina/http;
 import ballerinax/ai.azure.search as azureSearch;
 
 configurable string serviceUrl = ?;
@@ -223,13 +222,13 @@ public function main() returns error? {
     
     // Step 4: Run the indexer
     io:println("Step 4: Running indexer...");
-    http:Response runResponse = check searchClient->indexersRun("documents-indexer", {"api-key": adminKey, "Content-Length": 1000}, {
+    error? runResponse = searchClient->indexersRun("documents-indexer", {"api-key": adminKey, "Content-Length": 1000}, {
         api\-version: "2025-09-01"
     });
-    if runResponse.statusCode == 202 {
+    if runResponse is () {
         io:println("✓ Indexer started successfully");
     } else {
-        io:println("⚠ Indexer run request returned status: " + runResponse.statusCode.toString());
+        io:println("⚠ Indexer run request returned status: ");
     }
     
     // Step 5: Check indexer status
