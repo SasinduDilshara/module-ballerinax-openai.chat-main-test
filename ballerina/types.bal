@@ -59,7 +59,7 @@ public type DataSourceCredentials record {
 };
 
 # Defines the data type of a field in a search index.
-public type SearchFieldDataType "Edm.String"|"Edm.Int32"|"Edm.Int64"|"Edm.Double"|"Edm.Boolean"|"Edm.DateTimeOffset"|"Edm.GeographyPoint"|"Edm.ComplexType"|"Edm.Single"|"Edm.Half"|"Edm.Int16"|"Edm.SByte"|"Edm.Byte";
+public type SearchFieldDataType "Edm.String"|"Edm.Int32"|"Edm.Int64"|"Edm.Double"|"Edm.Boolean"|"Edm.DateTimeOffset"|"Edm.GeographyPoint"|"Edm.ComplexType"|"Edm.Single"|"Edm.Half"|"Edm.Int16"|"Edm.SByte"|"Edm.Byte"|"Collection(Edm.Single)"|"Collection(Edm.Half)"|"Collection(Edm.SByte)"|"Collection(Edm.Int16)"|"Collection(Edm.Byte)";
 
 # Defines the function used to interpolate score boosting across a range of documents.
 public type ScoringFunctionInterpolation "linear"|"constant"|"quadratic"|"logarithmic";
