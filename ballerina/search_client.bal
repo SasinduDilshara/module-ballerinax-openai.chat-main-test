@@ -21,7 +21,7 @@ import ballerina/data.jsondata;
 import ballerina/http;
 
 # Client that can be used to manage and query indexes and documents, as well as manage other resources, on a search service.
-public isolated client class Client {
+public isolated client class SearchClient {
     final http:Client clientEp;
     # Gets invoked to initialize the `connector`.
     #

@@ -5,7 +5,7 @@ name = "ai.azure.search"
 version = "1.0.0"
 license = ["Apache-2.0"]
 authors = ["Ballerina"]
-keywords = ["AI/Search", "Azure", "Cognitive Search", "Azure AI Search", "Vendor/Microsoft"]
+keywords = ["AI/Search", "Azure", "Cognitive Search", "Azure AI Search", "Search Index", "Document Search", "Vendor/Microsoft"]
 icon = "icon.png"
 repository = "https://github.com/ballerina-platform/module-ballerinax-ai.azure.search"
 

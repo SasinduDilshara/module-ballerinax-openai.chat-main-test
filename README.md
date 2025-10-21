@@ -10,6 +10,10 @@
 
 The `ballarinax/ai.azure.search` package offers functionality to connect and interact with [Azure AI Search REST API](https://docs.microsoft.com/en-us/rest/api/searchservice/) enabling seamless integration with Azure's powerful search and indexing capabilities for building comprehensive search solutions.
 
+This package provides two main clients:
+- **SearchClient**: For managing and querying indexes, data sources, indexers, skillsets, and other search service resources
+- **IndexClient**: For querying an index and performing document operations (search, suggest, autocomplete, index documents)
+
 ## Setup guide
 
 To use the Azure AI Search Connector, you must have an Azure subscription and an Azure AI Search service. If you do not have an Azure account, you can sign up for one [here](https://azure.microsoft.com/free/).
@@ -54,24 +58,39 @@ import ballerinax/ai.azure.search as azureSearch;
 
 ### Step 2: Create a new connector instance
 
-Create an `azureSearch:Client` with your Azure AI Search service URL and admin key.
+You can create clients for search management and document operations:
+
+#### SearchClient - For index and service management
 
 ```ballerina
 configurable string serviceUrl = ?;
 configurable string adminKey = ?;
 
-final azureSearch:Client searchClient = check new(serviceUrl, {
+final azureSearch:SearchClient searchClient = check new(serviceUrl, {
     auth: {
         apiKey: adminKey
     }
 });
 ```
 
-### Step 3: Invoke the connector operation
+#### IndexClient - For document operations
+
+```ballerina
+configurable string serviceUrl = ?;
+configurable string apiKey = ?;
+
+final azureSearch:IndexClient indexClient = check new(serviceUrl, {
+    auth: {
+        apiKey: apiKey
+    }
+});
+```
+
+### Step 3: Invoke the connector operations
 
 Now, you can utilize available connector operations.
 
-#### Create a search index
+#### Create a search index (using SearchClient)
 
 ```ballerina
 
@@ -100,6 +119,25 @@ public function main() returns error? {
 }
 ```
 
+#### Search documents (using IndexClient)
+
+```ballerina
+
+public function main() returns error? {
+    // Search for documents
+    azureSearch:SearchDocumentsResult searchResult = check indexClient->documentsSearchGet(
+        api\-version = "2025-09-01",
+        search = "luxury hotel",
+        \$top = 10
+    );
+    
+    // Process search results
+    foreach var doc in searchResult.value {
+        // Process each document
+    }
+}
+```
+
 ### Step 4: Run the Ballerina application
 
 ```bash
@@ -111,6 +149,7 @@ bal run
 The `Azure AI Search` connector provides practical examples illustrating usage in various scenarios. Explore these [examples](https://github.com/ballerina-platform/module-ballerinax-ai.azure.search/tree/main/examples/), covering the following use cases:
 
 1. [RAG ingestion](https://github.com/ballerina-platform/module-ballerinax-ai.azure.search/tree/main/examples/rag-ingestion) - A comprehensive example demonstrating the complete Azure AI Search workflow including data source creation, index creation, indexer setup, and execution.
+2. [Document search](https://github.com/ballerina-platform/module-ballerinax-ai.azure.search/tree/main/examples/document-search) - Demonstrates how to query and search documents in an Azure AI Search index using various search parameters and filters.
 
 ## Build from the source
 

@@ -1,8 +1,9 @@
 # Examples
 
-The `ballerinax/ai.azure.search` connector provides practical examples illustrating usage in various scenarios. Explore these [examples](https://github.com/ballerina-platform/module-ballerinax-ai.azure.search/tree/main/examples), covering use cases like index management, document indexing, and search operations.
+The `ballerinax/ai.azure.search` connector provides practical examples illustrating usage in various scenarios. Explore these [examples](https://github.com/ballerina-platform/module-ballerinax-ai.azure.search/tree/main/examples), covering use cases like index management, document indexing, search operations, and document querying.
 
 1. [RAG ingestion](https://github.com/ballerina-platform/module-ballerinax-ai.azure.search/tree/main/examples/rag-ingestion) - A comprehensive example demonstrating the complete Azure AI Search workflow including data source creation, index creation, indexer setup, and execution.
+2. [Document search](https://github.com/ballerina-platform/module-ballerinax-ai.azure.search/tree/main/examples/document-search) - Demonstrates how to query and search documents in an Azure AI Search index using various search parameters and filters.
 
 ## Prerequisites
 
@@ -13,6 +14,7 @@ The `ballerinax/ai.azure.search` connector provides practical examples illustrat
     ```toml
     serviceUrl = "https://your-service.search.windows.net"
     adminKey = "<Admin Key>"
+    apiKey = "<API Key>"
     ```
 
 ## Running an example

@@ -1347,3 +1347,535 @@ public type SearchIndexer record {
     # A customer-managed encryption key in Azure Key Vault. Keys that you create and manage can be used to encrypt or decrypt data-at-rest, such as indexes and synonym maps.
     SearchResourceEncryptionKey encryptionKey?;
 };
+
+# Parameters for filtering, sorting, fuzzy matching, and other suggestions query behaviors.
+public type SuggestRequest record {
+    # An OData expression that filters the documents considered for suggestions.
+    string filter?;
+    # A value indicating whether to use fuzzy matching for the suggestion query. Default is false. When set to true, the query will find suggestions even if there's a substituted or missing character in the search text. While this provides a better experience in some scenarios, it comes at a performance cost as fuzzy suggestion searches are slower and consume more resources.
+    boolean fuzzy?;
+    # A string tag that is appended to hit highlights. Must be set with highlightPreTag. If omitted, hit highlighting of suggestions is disabled.
+    string highlightPostTag?;
+    # A string tag that is prepended to hit highlights. Must be set with highlightPostTag. If omitted, hit highlighting of suggestions is disabled.
+    string highlightPreTag?;
+    # A number between 0 and 100 indicating the percentage of the index that must be covered by a suggestion query in order for the query to be reported as a success. This parameter can be useful for ensuring search availability even for services with only one replica. The default is 80.
+    decimal minimumCoverage?;
+    # The comma-separated list of OData $orderby expressions by which to sort the results. Each expression can be either a field name or a call to either the geo.distance() or the search.score() functions. Each expression can be followed by asc to indicate ascending, or desc to indicate descending. The default is ascending order. Ties will be broken by the match scores of documents. If no $orderby is specified, the default sort order is descending by document match score. There can be at most 32 $orderby clauses.
+    string orderby?;
+    # The search text to use to suggest documents. Must be at least 1 character, and no more than 100 characters.
+    string search;
+    # The comma-separated list of field names to search for the specified search text. Target fields must be included in the specified suggester.
+    string searchFields?;
+    # The comma-separated list of fields to retrieve. If unspecified, only the key field will be included in the results.
+    string 'select?;
+    # The name of the suggester as specified in the suggesters collection that's part of the index definition.
+    string suggesterName;
+    # The number of suggestions to retrieve. This must be a value between 1 and 100. The default is 5.
+    int:Signed32 top?;
+};
+
+# Represents the Headers record for the operation: documentsCount
+public type DocumentsCountHeaders record {
+    # The tracking ID sent with the request to help with debugging.
+    string x\-ms\-client\-request\-id?;
+};
+
+# Represents the Queries record for the operation: documentsSuggestPost
+public type DocumentsSuggestPostQueries record {
+    # Client Api Version.
+    string api\-version;
+};
+
+# Represents the Queries record for the operation: documentsSuggestGet
+public type DocumentsSuggestGetQueries record {
+    # Client Api Version.
+    string api\-version;
+    # The search text to use to suggest documents. Must be at least 1 character, and no more than 100 characters.
+    string search;
+    # A number between 0 and 100 indicating the percentage of the index that must be covered by a suggestions query in order for the query to be reported as a success. This parameter can be useful for ensuring search availability even for services with only one replica. The default is 80.
+    decimal minimumCoverage?;
+    # The number of suggestions to retrieve. The value must be a number between 1 and 100. The default is 5.
+    int:Signed32 \$top?;
+    # An OData expression that filters the documents considered for suggestions.
+    string \$filter?;
+    # The list of OData $orderby expressions by which to sort the results. Each expression can be either a field name or a call to either the geo.distance() or the search.score() functions. Each expression can be followed by asc to indicate ascending, or desc to indicate descending. The default is ascending order. Ties will be broken by the match scores of documents. If no $orderby is specified, the default sort order is descending by document match score. There can be at most 32 $orderby clauses.
+    string[] \$orderby?;
+    # The name of the suggester as specified in the suggesters collection that's part of the index definition.
+    string suggesterName;
+    # A string tag that is appended to hit highlights. Must be set with highlightPreTag. If omitted, hit highlighting of suggestions is disabled.
+    string highlightPostTag?;
+    # The list of field names to search for the specified search text. Target fields must be included in the specified suggester.
+    string[] searchFields?;
+    # A string tag that is prepended to hit highlights. Must be set with highlightPostTag. If omitted, hit highlighting of suggestions is disabled.
+    string highlightPreTag?;
+    # A value indicating whether to use fuzzy matching for the suggestions query. Default is false. When set to true, the query will find terms even if there's a substituted or missing character in the search text. While this provides a better experience in some scenarios, it comes at a performance cost as fuzzy suggestions queries are slower and consume more resources.
+    boolean fuzzy?;
+    # The list of fields to retrieve. If unspecified, only the key field will be included in the results.
+    string[] \$select?;
+};
+
+# Contains a batch of document write actions to send to the index.
+public type IndexBatch record {
+    # The actions in the batch.
+    IndexAction[] value;
+};
+
+# The result of Autocomplete requests.
+public type AutocompleteItem record {
+    # The completed term.
+    string text;
+    # The query along with the completed term.
+    string queryPlusText;
+};
+
+# Status of an indexing operation for a single document.
+public type IndexingResult record {
+    # The key of a document that was in the indexing request.
+    string 'key;
+    # The error message explaining why the indexing operation failed for the document identified by the key; null if indexing succeeded.
+    string errorMessage?;
+    # A value indicating whether the indexing operation succeeded for the document identified by the key.
+    boolean status;
+    # The status code of the indexing operation. Possible values include: 200 for a successful update or delete, 201 for successful document creation, 400 for a malformed input document, 404 for document not found, 409 for a version conflict, 422 when the index is temporarily unavailable, or 503 for when the service is too busy.
+    int:Signed32 statusCode;
+};
+
+# A value that specifies whether we want to calculate scoring statistics (such as document frequency) globally for more consistent scoring, or locally, for lower latency. The default is 'local'. Use 'global' to aggregate scoring statistics globally before scoring. Using global scoring statistics can increase latency of search queries.
+public type ScoringStatistics "local"|"global";
+
+# Represents the Queries record for the operation: documentsGet
+public type DocumentsGetQueries record {
+    # Client Api Version.
+    string api\-version;
+    # List of field names to retrieve for the document; Any field not retrieved will be missing from the returned document.
+    string[] \$select?;
+};
+
+# Represents the Headers record for the operation: documentsSearchGet
+public type DocumentsSearchGetHeaders record {
+    # The tracking ID sent with the request to help with debugging.
+    string x\-ms\-client\-request\-id?;
+};
+
+# Response containing the status of operations for all documents in the indexing request.
+public type IndexDocumentsResult record {
+    # The list of status information for each document in the indexing request.
+    IndexingResult[] value;
+};
+
+# Represents the Queries record for the operation: documentsSearchPost
+public type DocumentsSearchPostQueries record {
+    # Client Api Version.
+    string api\-version;
+};
+
+
+# Represents the Queries record for the operation: documentsIndex
+public type DocumentsIndexQueries record {
+    # Client Api Version.
+    string api\-version;
+};
+
+# An answer is a text passage extracted from the contents of the most relevant documents that matched the query. Answers are extracted from the top search results. Answer candidates are scored and the top answers are selected.
+public type AnswerResult record {
+    # The score value represents how relevant the answer is to the query relative to other answers returned for the query.
+    decimal score?;
+    # The key of the document the answer was extracted from.
+    string 'key?;
+    # The text passage extracted from the document contents as the answer.
+    string text?;
+    # Same text passage as in the Text property with highlighted text phrases most relevant to the query.
+    string? highlights?;
+};
+
+# Represents the Headers record for the operation: documentsIndex
+public type DocumentsIndexHeaders record {
+    # The tracking ID sent with the request to help with debugging.
+    string x\-ms\-client\-request\-id?;
+};
+
+# A document retrieved via a document lookup operation.
+public type LookupDocument record {
+};
+
+# Response containing search results from an index.
+public type SearchDocumentsResult record {
+    # The total count of results found by the search operation, or null if the count was not requested. If present, the count may be greater than the number of results in this response. This can happen if you use the $top or $skip parameters, or if the query can't return all the requested documents in a single response.
+    int \@odata\.count?;
+    # A value indicating the percentage of the index that was included in the query, or null if minimumCoverage was not specified in the request.
+    decimal \@search\.coverage?;
+    # The facet query results for the search operation, organized as a collection of buckets for each faceted field; null if the query did not include any facet expressions.
+    record {|FacetResult[]...;|} \@search\.facets?;
+    # The answers query results for the search operation; null if the answers query parameter was not specified or set to 'none'.
+    AnswerResult[]? \@search\.answers?;
+    # Parameters for filtering, sorting, faceting, paging, and other search query behaviors.
+    SearchRequest \@search\.nextPageParameters?;
+    # The sequence of results returned by the query.
+    SearchResult[] value;
+    # Continuation URL returned when the query can't return all the requested results in a single response. You can use this URL to formulate another GET or POST Search request to get the next part of the search response. Make sure to use the same verb (GET or POST) as the request that produced this response.
+    string \@odata\.nextLink?;
+    # Reason that a partial response was returned for a semantic ranking request.
+    SemanticPartialResponseReason \@search\.semanticPartialResponseReason?;
+    # Type of partial response that was returned for a semantic ranking request.
+    SemanticPartialResponseType \@search\.semanticPartialResponseType?;
+};
+
+# Determines whether or not filters are applied before or after the vector search is performed.
+public type VectorFilterMode "postFilter"|"preFilter";
+
+# The vector similarity and @search.score values for each vector query. Each cross-field vector query will have separate subscores for each referenced field.
+public type QueryResultDocumentVectorSubscores record {|
+    SingleVectorFieldResult...;
+|};
+
+# Represents the Headers record for the operation: documentsAutocompletePost
+public type DocumentsAutocompletePostHeaders record {
+    # The tracking ID sent with the request to help with debugging.
+    string x\-ms\-client\-request\-id?;
+};
+
+# This parameter is only valid if the query type is `semantic`. If set, the query returns captions extracted from key passages in the highest ranked documents. When Captions is set to `extractive`, highlighting is enabled by default, and can be configured by appending the pipe character `|` followed by the `highlight-<true/false>` option, such as `extractive|highlight-true`. Defaults to `None`.
+public type Captions "none"|"extractive";
+
+# A single vector field result. Both @search.score and vector similarity values are returned. Vector similarity is related to @search.score by an equation.
+public type SingleVectorFieldResult record {
+    # The @search.score value that is calculated from the vector similarity score. This is the score that's visible in a pure single-field single-vector query.
+    decimal searchScore?;
+    # The vector similarity score for this document. Note this is the canonical definition of similarity metric, not the 'distance' version. For example, cosine similarity instead of cosine distance.
+    decimal vectorSimilarity?;
+};
+
+# A single bucket of a facet query result. Reports the number of documents with a field value falling within a particular range or having a particular value or interval.
+public type FacetResult record {
+    # The approximate count of documents falling within the bucket described by this facet.
+    int count?;
+};
+
+# Contains debugging information that can be used to further explore your search results.
+public type DocumentDebugInfo record {
+    VectorsDebugInfo vectors?;
+};
+
+# The breakdown of subscores between the text and vector query components of the search query for this document. Each vector query is shown as a separate object in the same order they were received.
+public type QueryResultDocumentSubscores record {
+    # The BM25 or Classic score for the text portion of the query.
+    TextResult text?;
+    # The vector similarity and @search.score values for each vector query.
+    QueryResultDocumentVectorSubscores[] vectors?;
+    # The BM25 or Classic score for the text portion of the query.
+    decimal documentBoost?;
+};
+
+public type VectorsDebugInfo record {
+    # The breakdown of subscores between the text and vector query components of the search query for this document. Each vector query is shown as a separate object in the same order they were received.
+    QueryResultDocumentSubscores subscores?;
+};
+
+# Specifies the syntax of the search query. The default is 'simple'. Use 'full' if your query uses the Lucene query syntax.
+public type QueryType "simple"|"full"|"semantic";
+
+# Represents the Queries record for the operation: documentsAutocompletePost
+public type DocumentsAutocompletePostQueries record {
+    # Client Api Version.
+    string api\-version;
+};
+
+# Captions are the most representative passages from the document relatively to the search query. They are often used as document summary. Captions are only returned for queries of type `semantic`.
+public type CaptionResult record {
+    # A representative text passage extracted from the document most relevant to the search query.
+    string text?;
+    # Same text passage as in the Text property with highlighted phrases most relevant to the query.
+    string? highlights?;
+};
+
+# Parameters for filtering, sorting, faceting, paging, and other search query behaviors.
+public type SearchRequest record {
+    # A value that specifies whether to fetch the total count of results. Default is false. Setting this value to true may have a performance impact. Note that the count returned is an approximation.
+    boolean count?;
+    # The list of facet expressions to apply to the search query. Each facet expression contains a field name, optionally followed by a comma-separated list of name:value pairs.
+    string[] facets?;
+    # The OData $filter expression to apply to the search query.
+    string filter?;
+    # The comma-separated list of field names to use for hit highlights. Only searchable fields can be used for hit highlighting.
+    string highlight?;
+    # A string tag that is appended to hit highlights. Must be set with highlightPreTag. Default is &lt;/em&gt;.
+    string highlightPostTag?;
+    # A string tag that is prepended to hit highlights. Must be set with highlightPostTag. Default is &lt;em&gt;.
+    string highlightPreTag?;
+    # A number between 0 and 100 indicating the percentage of the index that must be covered by a search query in order for the query to be reported as a success. This parameter can be useful for ensuring search availability even for services with only one replica. The default is 100.
+    decimal minimumCoverage?;
+    # The comma-separated list of OData $orderby expressions by which to sort the results. Each expression can be either a field name or a call to either the geo.distance() or the search.score() functions. Each expression can be followed by asc to indicate ascending, or desc to indicate descending. The default is ascending order. Ties will be broken by the match scores of documents. If no $orderby is specified, the default sort order is descending by document match score. There can be at most 32 $orderby clauses.
+    string orderby?;
+    # Specifies the syntax of the search query. The default is 'simple'. Use 'full' if your query uses the Lucene query syntax.
+    QueryType queryType?;
+    # A value that specifies whether we want to calculate scoring statistics (such as document frequency) globally for more consistent scoring, or locally, for lower latency. The default is 'local'. Use 'global' to aggregate scoring statistics globally before scoring. Using global scoring statistics can increase latency of search queries.
+    ScoringStatistics scoringStatistics?;
+    # A value to be used to create a sticky session, which can help getting more consistent results. As long as the same sessionId is used, a best-effort attempt will be made to target the same replica set. Be wary that reusing the same sessionID values repeatedly can interfere with the load balancing of the requests across replicas and adversely affect the performance of the search service. The value used as sessionId cannot start with a '_' character.
+    string sessionId?;
+    # The list of parameter values to be used in scoring functions (for example, referencePointParameter) using the format name-values. For example, if the scoring profile defines a function with a parameter called 'mylocation' the parameter string would be "mylocation--122.2,44.8" (without the quotes).
+    string[] scoringParameters?;
+    # The name of a scoring profile to evaluate match scores for matching documents in order to sort the results.
+    string scoringProfile?;
+    # Enables a debugging tool that can be used to further explore your search results.
+    QueryDebugMode debug?;
+    # A full-text search query expression; Use "*" or omit this parameter to match all documents.
+    string search?;
+    # The comma-separated list of field names to which to scope the full-text search. When using fielded search (fieldName:searchExpression) in a full Lucene query, the field names of each fielded search expression take precedence over any field names listed in this parameter.
+    string searchFields?;
+    # Specifies whether any or all of the search terms must be matched in order to count the document as a match.
+    SearchMode searchMode?;
+    # The comma-separated list of fields to retrieve. If unspecified, all fields marked as retrievable in the schema are included.
+    string 'select?;
+    # The number of search results to skip. This value cannot be greater than 100,000. If you need to scan documents in sequence, but cannot use skip due to this limitation, consider using orderby on a totally-ordered key and filter with a range query instead.
+    int:Signed32 skip?;
+    # The number of search results to retrieve. This can be used in conjunction with $skip to implement client-side paging of search results. If results are truncated due to server-side paging, the response will include a continuation token that can be used to issue another Search request for the next page of results.
+    int:Signed32 top?;
+    # The name of a semantic configuration that will be used when processing documents for queries of type semantic.
+    string semanticConfiguration?;
+    # Allows the user to choose whether a semantic call should fail completely, or to return partial results.
+    SemanticErrorHandling semanticErrorHandling?;
+    # Allows the user to set an upper bound on the amount of time it takes for semantic enrichment to finish processing before the request fails.
+    int:Signed32? semanticMaxWaitInMilliseconds?;
+    # Allows setting a separate search query that will be solely used for semantic reranking, semantic captions and semantic answers. Is useful for scenarios where there is a need to use different queries between the base retrieval and ranking phase, and the L2 semantic phase.
+    string semanticQuery?;
+    # This parameter is only valid if the query type is `semantic`. If set, the query returns answers extracted from key passages in the highest ranked documents. The number of answers returned can be configured by appending the pipe character `|` followed by the `count-<number of answers>` option after the answers parameter value, such as `extractive|count-3`. Default count is 1. The confidence threshold can be configured by appending the pipe character `|` followed by the `threshold-<confidence threshold>` option after the answers parameter value, such as `extractive|threshold-0.9`. Default threshold is 0.7.
+    Answers answers?;
+    # This parameter is only valid if the query type is `semantic`. If set, the query returns captions extracted from key passages in the highest ranked documents. When Captions is set to `extractive`, highlighting is enabled by default, and can be configured by appending the pipe character `|` followed by the `highlight-<true/false>` option, such as `extractive|highlight-true`. Defaults to `None`.
+    Captions captions?;
+    # The query parameters for vector and hybrid search queries.
+    VectorQuery[] vectorQueries?;
+    # Determines whether or not filters are applied before or after the vector search is performed.
+    VectorFilterMode vectorFilterMode?;
+};
+
+# Represents the Queries record for the operation: documentsCount
+public type DocumentsCountQueries record {
+    # Client Api Version.
+    string api\-version;
+};
+
+# Represents the Headers record for the operation: documentsSuggestPost
+public type DocumentsSuggestPostHeaders record {
+    # The tracking ID sent with the request to help with debugging.
+    string x\-ms\-client\-request\-id?;
+};
+
+# A result containing a document found by a suggestion query, plus associated metadata.
+public type SuggestResult record {
+    # The text of the suggestion result.
+    string \@search\.text;
+};
+
+# Represents the Headers record for the operation: documentsGet
+public type DocumentsGetHeaders record {
+    # The tracking ID sent with the request to help with debugging.
+    string x\-ms\-client\-request\-id?;
+};
+
+# Represents the Headers record for the operation: documentsSearchPost
+public type DocumentsSearchPostHeaders record {
+    # The tracking ID sent with the request to help with debugging.
+    string x\-ms\-client\-request\-id?;
+};
+
+# Represents the Headers record for the operation: documentsSuggestGet
+public type DocumentsSuggestGetHeaders record {
+    # The tracking ID sent with the request to help with debugging.
+    string x\-ms\-client\-request\-id?;
+};
+
+# Reason that a partial response was returned for a semantic ranking request.
+public type SemanticPartialResponseReason "maxWaitExceeded"|"capacityOverloaded"|"transient";
+
+# Represents the Queries record for the operation: documentsSearchGet
+public type DocumentsSearchGetQueries record {
+    # Allows the user to set an upper bound on the amount of time it takes for semantic enrichment to finish processing before the request fails.
+    @constraint:Int {minValue: 700}
+    int:Signed32 semanticMaxWaitInMilliseconds?;
+    # Client Api Version.
+    string api\-version;
+    # Allows setting a separate search query that will be solely used for semantic reranking, semantic captions and semantic answers. Is useful for scenarios where there is a need to use different queries between the base retrieval and ranking phase, and the L2 semantic phase.
+    string semanticQuery?;
+    # The name of a scoring profile to evaluate match scores for matching documents in order to sort the results.
+    string scoringProfile?;
+    # A value that specifies whether any or all of the search terms must be matched in order to count the document as a match.
+    "any"|"all" searchMode?;
+    # This parameter is only valid if the query type is `semantic`. If set, the query returns answers extracted from key passages in the highest ranked documents. The number of answers returned can be configured by appending the pipe character `|` followed by the `count-<number of answers>` option after the answers parameter value, such as `extractive|count-3`. Default count is 1. The confidence threshold can be configured by appending the pipe character `|` followed by the `threshold-<confidence threshold>` option after the answers parameter value, such as `extractive|threshold-0.9`. Default threshold is 0.7.
+    "none"|"extractive" answers?;
+    # This parameter is only valid if the query type is `semantic`. If set, the query returns captions extracted from key passages in the highest ranked documents. When Captions is set to `extractive`, highlighting is enabled by default, and can be configured by appending the pipe character `|` followed by the `highlight-<true/false>` option, such as `extractive|highlight-true`. Defaults to `None`.
+    "none"|"extractive" captions?;
+    # The list of field names to use for hit highlights. Only searchable fields can be used for hit highlighting.
+    string[] highlight?;
+    # A full-text search query expression; Use "*" or omit this parameter to match all documents.
+    string search?;
+    # A number between 0 and 100 indicating the percentage of the index that must be covered by a search query in order for the query to be reported as a success. This parameter can be useful for ensuring search availability even for services with only one replica. The default is 100.
+    decimal minimumCoverage?;
+    # The number of search results to skip. This value cannot be greater than 100,000. If you need to scan documents in sequence, but cannot use $skip due to this limitation, consider using $orderby on a totally-ordered key and $filter with a range query instead.
+    int:Signed32 \$skip?;
+    # The list of parameter values to be used in scoring functions (for example, referencePointParameter) using the format name-values. For example, if the scoring profile defines a function with a parameter called 'mylocation' the parameter string would be "mylocation--122.2,44.8" (without the quotes).
+    string[] scoringParameter?;
+    # The list of field names to which to scope the full-text search. When using fielded search (fieldName:searchExpression) in a full Lucene query, the field names of each fielded search expression take precedence over any field names listed in this parameter.
+    string[] searchFields?;
+    # The name of the semantic configuration that lists which fields should be used for semantic ranking, captions, highlights, and answers
+    string semanticConfiguration?;
+    # The number of search results to retrieve. This can be used in conjunction with $skip to implement client-side paging of search results. If results are truncated due to server-side paging, the response will include a continuation token that can be used to issue another Search request for the next page of results.
+    int:Signed32 \$top?;
+    # Enables a debugging tool that can be used to further explore your search results.
+    "disabled"|"vector" debug?;
+    # A value to be used to create a sticky session, which can help to get more consistent results. As long as the same sessionId is used, a best-effort attempt will be made to target the same replica set. Be wary that reusing the same sessionID values repeatedly can interfere with the load balancing of the requests across replicas and adversely affect the performance of the search service. The value used as sessionId cannot start with a '_' character.
+    string sessionId?;
+    # A string tag that is prepended to hit highlights. Must be set with highlightPostTag. Default is &lt;em&gt;.
+    string highlightPreTag?;
+    # Allows the user to choose whether a semantic call should fail completely, or to return partial results (default).
+    "partial"|"fail" semanticErrorHandling?;
+    # A value that specifies the syntax of the search query. The default is 'simple'. Use 'full' if your query uses the Lucene query syntax.
+    "simple"|"full"|"semantic" queryType?;
+    # A value that specifies whether we want to calculate scoring statistics (such as document frequency) globally for more consistent scoring, or locally, for lower latency.
+    "local"|"global" scoringStatistics?;
+    # The OData $filter expression to apply to the search query.
+    string \$filter?;
+    # The list of OData $orderby expressions by which to sort the results. Each expression can be either a field name or a call to either the geo.distance() or the search.score() functions. Each expression can be followed by asc to indicate ascending, and desc to indicate descending. The default is ascending order. Ties will be broken by the match scores of documents. If no OrderBy is specified, the default sort order is descending by document match score. There can be at most 32 $orderby clauses.
+    string[] \$orderby?;
+    # A string tag that is appended to hit highlights. Must be set with highlightPreTag. Default is &lt;/em&gt;.
+    string highlightPostTag?;
+    # The list of facet expressions to apply to the search query. Each facet expression contains a field name, optionally followed by a comma-separated list of name:value pairs.
+    string[] facet?;
+    # A value that specifies whether to fetch the total count of results. Default is false. Setting this value to true may have a performance impact. Note that the count returned is an approximation.
+    boolean \$count?;
+    # The list of fields to retrieve. If unspecified, all fields marked as retrievable in the schema are included.
+    string[] \$select?;
+};
+
+# Represents an index action that operates on a document.
+public type IndexAction record {
+    # The operation to perform on a document in an indexing batch.
+    "upload"|"merge"|"mergeOrUpload"|"delete" \@search\.action?;
+};
+
+# The BM25 or Classic score for the text portion of the query.
+public type TextResult record {
+    # The BM25 or Classic score for the text portion of the query.
+    decimal searchScore?;
+};
+
+# This parameter is only valid if the query type is `semantic`. If set, the query returns answers extracted from key passages in the highest ranked documents. The number of answers returned can be configured by appending the pipe character `|` followed by the `count-<number of answers>` option after the answers parameter value, such as `extractive|count-3`. Default count is 1. The confidence threshold can be configured by appending the pipe character `|` followed by the `threshold-<confidence threshold>` option after the answers parameter value, such as `extractive|threshold-0.9`. Default threshold is 0.7.
+public type Answers "none"|"extractive";
+
+# Parameters for fuzzy matching, and other autocomplete query behaviors.
+public type AutocompleteRequest record {
+    # The search text on which to base autocomplete results.
+    string search;
+    # Specifies the mode for Autocomplete. The default is 'oneTerm'. Use 'twoTerms' to get shingles and 'oneTermWithContext' to use the current context in producing autocomplete terms.
+    AutocompleteMode autocompleteMode?;
+    # An OData expression that filters the documents used to produce completed terms for the Autocomplete result.
+    string filter?;
+    # A value indicating whether to use fuzzy matching for the autocomplete query. Default is false. When set to true, the query will autocomplete terms even if there's a substituted or missing character in the search text. While this provides a better experience in some scenarios, it comes at a performance cost as fuzzy autocomplete queries are slower and consume more resources.
+    boolean fuzzy?;
+    # A string tag that is appended to hit highlights. Must be set with highlightPreTag. If omitted, hit highlighting is disabled.
+    string highlightPostTag?;
+    # A string tag that is prepended to hit highlights. Must be set with highlightPostTag. If omitted, hit highlighting is disabled.
+    string highlightPreTag?;
+    # A number between 0 and 100 indicating the percentage of the index that must be covered by an autocomplete query in order for the query to be reported as a success. This parameter can be useful for ensuring search availability even for services with only one replica. The default is 80.
+    decimal minimumCoverage?;
+    # The comma-separated list of field names to consider when querying for auto-completed terms. Target fields must be included in the specified suggester.
+    string searchFields?;
+    # The name of the suggester as specified in the suggesters collection that's part of the index definition.
+    string suggesterName;
+    # The number of auto-completed terms to retrieve. This must be a value between 1 and 100. The default is 5.
+    int:Signed32 top?;
+};
+
+# Specifies the mode for Autocomplete. The default is 'oneTerm'. Use 'twoTerms' to get shingles and 'oneTermWithContext' to use the current context in producing autocomplete terms.
+public type AutocompleteMode "oneTerm"|"twoTerms"|"oneTermWithContext";
+
+# Contains a document found by a search query, plus associated metadata.
+public type SearchResult record {
+    # The relevance score of the document compared to other documents returned by the query.
+    decimal \@search\.score;
+    # The relevance score computed by the semantic ranker for the top search results. Search results are sorted by the RerankerScore first and then by the Score. RerankerScore is only returned for queries of type 'semantic'.
+    decimal? \@search\.rerankerScore?;
+    # The relevance score computed by boosting the Reranker Score. Search results are sorted by the RerankerScore/RerankerBoostedScore based on useScoringProfileBoostedRanking in the Semantic Config. RerankerBoostedScore is only returned for queries of type 'semantic'
+    decimal? \@search\.rerankerBoostedScore?;
+    # Text fragments from the document that indicate the matching search terms, organized by each applicable field; null if hit highlighting was not enabled for the query.
+    record {|string[]...;|} \@search\.highlights?;
+    # Captions are the most representative passages from the document relatively to the search query. They are often used as document summary. Captions are only returned for queries of type 'semantic'.
+    CaptionResult[]? \@search\.captions?;
+    # Contains debugging information that can be used to further explore your search results.
+    DocumentDebugInfo \@search\.documentDebugInfo?;
+};
+
+# Response containing suggestion query results from an index.
+public type SuggestDocumentsResult record {
+    # The sequence of results returned by the query.
+    SuggestResult[] value;
+    # A value indicating the percentage of the index that was included in the query, or null if minimumCoverage was not set in the request.
+    decimal \@search\.coverage?;
+};
+
+# Allows the user to choose whether a semantic call should fail completely, or to return partial results.
+public type SemanticErrorHandling "partial"|"fail";
+
+# The query parameters for vector and hybrid search queries.
+public type VectorQuery record {
+    # The kind of vector query being performed.
+    VectorQueryKind kind;
+    # Number of nearest neighbors to return as top hits.
+    int:Signed32 k?;
+    # Vector Fields of type Collection(Edm.Single) to be included in the vector searched.
+    string fields?;
+    # When true, triggers an exhaustive k-nearest neighbor search across all vectors within the vector index. Useful for scenarios where exact matches are critical, such as determining ground truth values.
+    boolean exhaustive?;
+    # Oversampling factor. Minimum value is 1. It overrides the 'defaultOversampling' parameter configured in the index definition. It can be set only when 'rerankWithOriginalVectors' is true. This parameter is only permitted when a compression method is used on the underlying vector field.
+    decimal oversampling?;
+    # Relative weight of the vector query when compared to other vector query and/or the text query within the same search request. This value is used when combining the results of multiple ranking lists produced by the different vector queries and/or the results retrieved through the text query. The higher the weight, the higher the documents that matched that query will be in the final ranking. Default is 1.0 and the value needs to be a positive number larger than zero. 
+    float weight?;
+};
+
+# Represents the Headers record for the operation: documentsAutocompleteGet
+public type DocumentsAutocompleteGetHeaders record {
+    # The tracking ID sent with the request to help with debugging.
+    string x\-ms\-client\-request\-id?;
+};
+
+# Represents the Queries record for the operation: documentsAutocompleteGet
+public type DocumentsAutocompleteGetQueries record {
+    # Client Api Version.
+    string api\-version;
+    # The incomplete term which should be auto-completed.
+    string search;
+    # A number between 0 and 100 indicating the percentage of the index that must be covered by an autocomplete query in order for the query to be reported as a success. This parameter can be useful for ensuring search availability even for services with only one replica. The default is 80.
+    decimal minimumCoverage?;
+    # Specifies the mode for Autocomplete. The default is 'oneTerm'. Use 'twoTerms' to get shingles and 'oneTermWithContext' to use the current context while producing auto-completed terms.
+    "oneTerm"|"twoTerms"|"oneTermWithContext" autocompleteMode?;
+    # The number of auto-completed terms to retrieve. This must be a value between 1 and 100. The default is 5.
+    int:Signed32 \$top?;
+    # An OData expression that filters the documents used to produce completed terms for the Autocomplete result.
+    string \$filter?;
+    # The name of the suggester as specified in the suggesters collection that's part of the index definition.
+    string suggesterName;
+    # A string tag that is appended to hit highlights. Must be set with highlightPreTag. If omitted, hit highlighting is disabled.
+    string highlightPostTag?;
+    # The list of field names to consider when querying for auto-completed terms. Target fields must be included in the specified suggester.
+    string[] searchFields?;
+    # A string tag that is prepended to hit highlights. Must be set with highlightPostTag. If omitted, hit highlighting is disabled.
+    string highlightPreTag?;
+    # A value indicating whether to use fuzzy matching for the autocomplete query. Default is false. When set to true, the query will find terms even if there's a substituted or missing character in the search text. While this provides a better experience in some scenarios, it comes at a performance cost as fuzzy autocomplete queries are slower and consume more resources.
+    boolean fuzzy?;
+};
+
+# Type of partial response that was returned for a semantic ranking request.
+public type SemanticPartialResponseType "baseResults"|"rerankedResults";
+
+# The Search request.
+public type docs_search_post_search_body SearchRequest;
+
+# Specifies whether any or all of the search terms must be matched in order to count the document as a match.
+public type SearchMode "any"|"all";
+
+# The result of Autocomplete query.
+public type AutocompleteResult record {
+    # A value indicating the percentage of the index that was considered by the autocomplete request, or null if minimumCoverage was not specified in the request.
+    decimal \@search\.coverage?;
+    # The list of returned Autocompleted items.
+    AutocompleteItem[] value;
+};
